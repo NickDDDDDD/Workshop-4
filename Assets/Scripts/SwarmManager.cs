@@ -15,6 +15,7 @@ public class SwarmManager : MonoBehaviour
     [SerializeField] private float stepTime;
     [SerializeField] private float leftBoundaryX;
     [SerializeField] private float rightBoundaryX;
+    [SerializeField] private int direction = 1;
 
     private void Start()
     {
@@ -50,6 +51,24 @@ public class SwarmManager : MonoBehaviour
     private void GenerateSwarm()
     {
         // Write code here...
+         // Loop through each row
+    for (int i = 0; i < enemyCols; i++)
+    {
+        // Loop through each column
+        for (int j = 0; j < enemyRows; j++)
+        {
+            // Calculate the position for each enemy based on its row and column, as well as the defined spacing.
+            float xPosition = i * enemySpacing;
+            float zPosition =  j* enemySpacing; // Negative since we want to move downwards for each row.
+
+            // Instantiate the enemy at the calculated position.
+            // Quaternion.identity means "no rotation".
+            var enemy = Instantiate(enemyTemplate, transform);
+            // Make the instantiated enemy a child of the SwarmManager to keep the hierarchy organized.
+            
+            enemy.transform.localPosition = new Vector3(xPosition, 0f, zPosition);
+        }
+    }
     }
 
     // Step the swarm across the screen, based on the current direction, or down
@@ -57,7 +76,22 @@ public class SwarmManager : MonoBehaviour
     private void StepSwarm()
     {
         // Write code here...
-        
+        var swarmWidth = (this.enemyCols - 1) * this.enemySpacing;
+        var swarmMinX = transform.localPosition.x;
+        var swarmMaxX = swarmMinX + swarmWidth;
+
+
+        if(swarmMinX < this.leftBoundaryX && this.direction == -1  || 
+           swarmMaxX > this.rightBoundaryX && this.direction == 1)
+        {
+            transform.Translate(Vector3.back * this.stepSize);
+            this.direction = -this.direction;
+
+        }else{
+             transform.Translate(Vector3.right * (this.direction * this.stepSize));
+
+
+        }
         // Tip: You probably want a private variable to keep track of the
         // direction the swarm is moving. You could alternate this between 1 and
         // -1 to serve as a vector multiplier when stepping the swarm.
